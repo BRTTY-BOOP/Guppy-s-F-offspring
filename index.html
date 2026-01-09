@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>孔雀鱼高级杂交育种管理系统 | Guppy Breeding System</title>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; }
+        body { margin: 0; padding: 20px; background-color: #f0f9ff; color: #333; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; background-color: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0, 0, 150, 0.08); padding: 25px; position: relative; overflow: hidden; }
+        .header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #4a9de3; }
+        .header h1 { color: #1a5fa0; margin-bottom: 10px; font-size: 2.2rem; }
+        .section { margin-bottom: 40px; padding: 20px; background-color: #f8fbff; border-radius: 12px; border-left: 5px solid #4a9de3; }
+        .section-title { color: #1a5fa0; margin-top: 0; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px dashed #a8d0ff; font-size: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
+        th { background-color: #1a5fa0; color: white; padding: 14px 12px; text-align: left; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #e1eef9; vertical-align: top; }
+        tr:nth-child(even) { background-color: #f8fbff; }
+        tr:hover { background-color: #e8f2ff; }
+        .hybrid-formula { font-family: 'Courier New', monospace; background-color: #f0f7ff; padding: 8px 12px; border-radius: 6px; border-left: 3px solid #4a9de3; margin: 5px 0; }
+        .btn { padding: 12px 24px; background-color: #1a5fa0; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: all 0.3s; margin-right: 10px; margin-bottom: 10px; }
+        .btn:hover { background-color: #13497a; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .btn-excel { background-color: #217346; }
+        .btn-excel:hover { background-color: #1a5c38; }
+        .controls { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e1eef9; }
+        .watermark { position: absolute; bottom: 10px; right: 15px; opacity: 0.05; font-size: 6rem; color: #1a5fa0; z-index: 0; pointer-events: none; }
+        /* 语言切换按钮样式 */
+        .lang-switcher { position: absolute; top: 25px; right: 25px; z-index: 1000; }
+        .lang-btn { padding: 8px 16px; background-color: #4a9de3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .lang-btn:hover { background-color: #2c7bc2; }
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .lang-switcher { position: static; text-align: right; margin-bottom: 15px; }
+            th, td { padding: 8px; }
+            .btn { width: 100%; margin-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lang-switcher">
+            <button id="toggleLang" class="lang-btn">EN</button>
+        </div>
+        <div class="watermark" data-i18n="watermark">孔雀鱼育种</div>
+
+        <div class="header">
+            <h1 data-i18n="title">🐠 孔雀鱼高级杂交育种管理系统 🐠</h1>
+            <p data-i18n="subtitle">为您提供的孔雀鱼品种设计科学的杂交公式，并记录繁育项目以获得优良F1子代</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title" data-i18n="breedList">📋 您的孔雀鱼品种清单</h2>
+            <p data-i18n="breedDesc">根据您提供的品种，系统已自动分类并设计杂交公式：</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;">
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">天空蓝</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">火烧云天空蓝</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">蓝礼服大C</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">普通蓝礼服</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">冰蓝</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">白金象耳</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">拉朱莉</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">彩虹天使</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">金粉</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">蓝草尾</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">金属蓝草尾</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">跑红体蓝草尾</span>
+                <span style="background-color: #e1f0ff; padding: 8px 15px; border-radius: 20px;">菊花帆褶扇</span>
+                <span style="background-color: #ffe1e1; padding: 8px 15px; border-radius: 20px;">安格拉斯双剑鱼</span>
+                <span style="background-color: #ffe1e1; padding: 8px 15px; border-radius: 20px;">火焰精灵剑鱼</span>
+                <span style="background-color: #ffe1e1; padding: 8px 15px; border-radius: 20px;">日本蓝白红剑尾孔雀鱼</span>
+            </div>
+            <p style="margin-top:15px;font-style:italic;color:#666;" data-i18n="geneticNote">注：<span style="color: #ff6b6b;">红色背景</span>品种为剑尾鱼，与孔雀鱼存在生殖隔离，无法杂交，建议分开饲养。</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title" data-i18n="hybridTitle">🧬 科学杂交公式 (F1代优质组合)</h2>
+            <p data-i18n="hybridDesc">基于遗传学原理设计的组合，旨在获得品相优良、基因稳定的F1子代：</p>
+            <table id="hybridTable">
+                <thead>
+                    <tr>
+                        <th width="20%" data-i18n="comboName">组合名称</th>
+                        <th width="25%" data-i18n="formula">杂交公式</th>
+                        <th width="35%" data-i18n="f1Expectation">F1代预期表现与选育目标</th>
+                        <th width="20%" data-i18n="geneticKey">遗传关键点</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong data-i18n="combo1Name">礼服天空蓝强化</strong></td>
+                        <td>
+                            <div class="hybrid-formula" data-i18n="combo1Formula1">♀ 蓝礼服大C × ♂ 火烧云天空蓝</div>
+                            <div style="text-align:center;" data-i18n="or">或</div>
+                            <div class="hybrid-formula" data-i18n="combo1Formula2">♀ 普通蓝礼服 × ♂ 天空蓝</div>
+                        </td>
+                        <td data-i18n="combo1Desc">获得尾型饱满(礼服基因)且体色鲜亮(天空蓝基因)的个体。F1代中筛选:<br>1. 尾鳍宽大且边缘黑色明显<br>2. 蓝色体色纯净无杂斑<br>3. 背鳍高耸的个体留种</td>
+                        <td data-i18n="combo1Key">礼服基因(半显性)+天空蓝基因(性连锁)</td>
+                    </tr>
+                    <tr>
+                        <td><strong data-i18n="combo2Name">金属蓝草改良</strong></td>
+                        <td>
+                            <div class="hybrid-formula" data-i18n="combo2Formula1">♀ 蓝草尾 × ♂ 金属蓝草尾</div>
+                            <div style="text-align:center;" data-i18n="or">或</div>
+                            <div class="hybrid-formula" data-i18n="combo2Formula2">♀ 跑红体蓝草 × ♂ 金属蓝草尾</div>
+                        </td>
+                        <td data-i18n="combo2Desc">增强草尾的金属光泽与蓝色饱和度。跑红体组合可引入黄化基因改善体型。F1代中筛选:<br>1. 鳞片金属反光强烈<br>2. 尾鳍纹路清晰整齐<br>3. 体型匀称无脊柱弯曲</td>
+                        <td data-i18n="combo2Key">金属基因(限性)+蓝草基因(多基因)</td>
+                    </tr>
+                    <tr>
+                        <td><strong data-i18n="combo3Name">冰蓝天空融合</strong></td>
+                        <td>
+                            <div class="hybrid-formula" data-i18n="combo3Formula1">♀ 冰蓝 × ♂ 天空蓝</div>
+                            <div style="text-align:center;" data-i18n="or">或</div>
+                            <div class="hybrid-formula" data-i18n="combo3Formula2">♀ 冰蓝 × ♂ 火烧云天空蓝</div>
+                        </td>
+                        <td data-i18n="combo3Desc">创造淡雅与鲜亮之间的过渡色系。可能获得"冰晶天空蓝"新表现型。F1代中筛选:<br>1. 体色均匀无斑块<br>2. 蓝色具有通透感<br>3. 背鳍与尾鳍颜色协调</td>
+                        <td data-i18n="combo3Key">冰蓝基因(隐性)+天空蓝基因(性连锁)</td>
+                    </tr>
+                    <tr>
+                        <td><strong data-i18n="combo4Name">白金基因提纯</strong></td>
+                        <td>
+                            <div class="hybrid-formula" data-i18n="combo4Formula1">♀ 白金象耳 × ♂ 白金象耳</div>
+                            <div style="text-align:center;" data-i18n="or">或</div>
+                            <div class="hybrid-formula" data-i18n="combo4Formula2">♀ 白金象耳 × ♂ 跑红体蓝草</div>
+                        </td>
+                        <td data-i18n="combo4Desc">提纯白金基因或引入黄化基因改善体型。F1代中筛选:<br>1. 白金覆盖面积≥80%<br>2. 耳状胸鳍明显<br>3. 体型健壮无畸形</td>
+                        <td data-i18n="combo4Key">白金基因(限性)+跑红体基因(隐性)</td>
+                    </tr>
+                    <tr>
+                        <td><strong data-i18n="combo5Name">特殊尾型固定</strong></td>
+                        <td>
+                            <div class="hybrid-formula" data-i18n="combo5Formula1">♀ 菊花帆褶扇 × ♂ 蓝礼服大C</div>
+                            <div style="text-align:center;" data-i18n="or">或</div>
+                            <div class="hybrid-formula" data-i18n="combo5Formula2">♀ 菊花帆褶扇 × ♂ 金属蓝草尾</div>
+                        </td>
+                        <td data-i18n="combo5Desc">将特殊尾型与优质体色结合。F1代中筛选:<br>1. 尾鳍褶皱分明呈菊花状<br>2. 展开角度≥120°<br>3. 游姿稳健不歪斜</td>
+                        <td data-i18n="combo5Key">菊花尾基因(多基因)+礼服/金属基因</td>
+                    </tr>
+                    <tr>
+                        <td><strong data-i18n="combo6Name">自交提纯组合</strong></td>
+                        <td>
+                            <div class="hybrid-formula" data-i18n="combo6Formula1">♀ 拉朱莉 × ♂ 拉朱莉</div>
+                            <div class="hybrid-formula" data-i18n="combo6Formula2">♀ 彩虹天使 × ♂ 彩虹天使</div>
+                            <div class="hybrid-formula" data-i18n="combo6Formula3">♀ 金粉 × ♂ 金粉</div>
+                        </td>
+                        <td data-i18n="combo6Desc">保持纯种基因稳定性，防止退化。连续自交不超过3代，需记录每代表现。</td>
+                        <td data-i18n="combo6Key">纯合子维持，注意近交衰退</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-style:italic;color:#666;font-size:0.9rem;" data-i18n="hybridNote">注：所有杂交建议使用6月龄以上健康种鱼，雌雄比例建议1:2或1:3，产前提供充足活饵。</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title" data-i18n="recordTitle">📝 繁育项目记录表</h2>
+            <p data-i18n="recordDesc">记录每次杂交实验的详细信息，用于追踪F1代表现和选育进程：</p>
+            <div style="margin-bottom:20px;">
+                <button class="btn" id="addRecordBtn" data-i18n="addRecord">+ 添加新记录</button>
+                <button class="btn" id="clearBtn" data-i18n="clearTable">清空表格</button>
+            </div>
+            <table id="breedingTable">
+                <thead>
+                    <tr>
+                        <th width="8%" data-i18n="recordId">记录ID</th>
+                        <th width="12%" data-i18n="hybridDate">杂交日期</th>
+                        <th width="15%" data-i18n="hybridCombo">杂交组合</th>
+                        <th width="10%" data-i18n="femaleId">母本编号</th>
+                        <th width="10%" data-i18n="maleId">父本编号</th>
+                        <th width="10%" data-i18n="spawnDate">产卵日期</th>
+                        <th width="8%" data-i18n="f1Count">F1数量</th>
+                        <th width="27%" data-i18n="f1Notes">F1代表现与选留记录</th>
+                    </tr>
+                </thead>
+                <tbody id="breedingTableBody">
+                    <tr>
+                        <td>BR-001</td>
+                        <td><input type="date" value="2023-10-15"></td>
+                        <td>
+                            <select>
+                                <option data-i18n="combo1Name">礼服天空蓝强化</option>
+                                <option data-i18n="combo2Name" selected>金属蓝草改良</option>
+                                <option data-i18n="combo3Name">冰蓝天空融合</option>
+                                <option data-i18n="combo4Name">白金基因提纯</option>
+                                <option data-i18n="combo5Name">特殊尾型固定</option>
+                                <option data-i18n="combo6Name">自交提纯组合</option>
+                            </select>
+                        </td>
+                        <td><input type="text" value="F-蓝草-03" data-i18n-ph="femalePlaceholder" placeholder="如: F-蓝草-03"></td>
+                        <td><input type="text" value="M-金属草-07" data-i18n-ph="malePlaceholder" placeholder="如: M-金属草-07"></td>
+                        <td><input type="date" value="2023-10-30"></td>
+                        <td><input type="number" value="42" min="0" data-i18n-ph="countPlaceholder" placeholder="数量"></td>
+                        <td><textarea rows="2" data-i18n-ph="notesPlaceholder" placeholder="记录F1代表现...">35天时筛选：10条金属感强，尾型佳，已隔离培养</textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:20px;">
+                <label for="notes" style="display:block;margin-bottom:8px;color:#1a5fa0;font-weight:600;" data-i18n="currentNotes">本次记录备注</label>
+                <textarea id="notes" rows="3" data-i18n-ph="currentNotesPlaceholder" placeholder="记录本次杂交的特殊情况、观察发现或后续计划..." style="width:100%;padding:12px;border:1px solid #b8d4f0;border-radius:6px;"></textarea>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-excel" id="exportExcelBtn" data-i18n="exportExcel">📥 下载Excel育种记录表</button>
+            <button class="btn" id="printBtn" data-i18n="print">🖨️ 打印当前页面</button>
+            <button class="btn" id="saveDataBtn" data-i18n="saveLocal">💾 保存数据到本地</button>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title" data-i18n="expertTips">💡 育种专家建议</h2>
+            <ol>
+                <li data-i18n="tip1"><strong>基因分离规律</strong>：F1代可能呈现亲本中间性状，F2代才会出现性状分离，建议保留F2代继续选育。</li>
+                <li data-i18n="tip2"><strong>选育标准</strong>：重点关注尾型、体色、体型、游姿四个指标，每个指标设定具体标准。</li>
+                <li data-i18n="tip3"><strong>记录重要性</strong>：详细记录每代亲本编号，避免近亲繁殖导致基因衰退。</li>
+                <li data-i18n="tip4"><strong>剑尾鱼处理</strong>：剑尾鱼与孔雀鱼存在生殖隔离，请分开饲养。</li>
+                <li data-i18n="tip5"><strong>健康管理</strong>：繁殖期提供高蛋白活饵，保持水质稳定（pH 7.0-7.5，温度24-26℃）。</li>
+            </ol>
+        </div>
+
+        <div style="text-align:center;margin-top:40px;color:#666;font-size:0.9rem;padding-top:20px;border-top:1px solid #e1eef9;">
+            <p data-i18n="footer">孔雀鱼高级杂交育种管理系统 | 基于遗传学原理设计 | 数据仅存储于本地浏览器</p>
+        </div>
+    </div>
+
+    <script>
+        // 中英文翻译字典
+        const translations = {
+            'zh': {
+                'title': '🐠 孔雀鱼高级杂交育种管理系统 🐠',
+                'subtitle': '为您提供的孔雀鱼品种设计科学的杂交公式，并记录繁育项目以获得优良F1子代',
+                'watermark': '孔雀鱼育种',
+                'breedList': '📋 您的孔雀鱼品种清单',
+                'breedDesc': '根据您提供的品种，系统已自动分类并设计杂交公式：',
+                'geneticNote': '注：红色背景品种为剑尾鱼，与孔雀鱼存在生殖隔离，无法杂交，建议分开饲养。',
+                'hybridTitle': '🧬 科学杂交公式 (F1代优质组合)',
+                'hybridDesc': '基于遗传学原理设计的组合，旨在获得品相优良、基因稳定的F1子代：',
+                'comboName': '组合名称',
+                'formula': '杂交公式',
+                'f1Expectation': 'F1代预期表现与选育目标',
+                'geneticKey': '遗传关键点',
+                'combo1Name': '礼服天空蓝强化',
+                'combo1Formula1': '♀ 蓝礼服大C × ♂ 火烧云天空蓝',
+                'combo1Formula2': '♀ 普通蓝礼服 × ♂ 天空蓝',
+                'combo1Desc': '获得尾型饱满(礼服基因)且体色鲜亮(天空蓝基因)的个体。F1代中筛选:<br>1. 尾鳍宽大且边缘黑色明显<br>2. 蓝色体色纯净无杂斑<br>3. 背鳍高耸的个体留种',
+                'combo1Key': '礼服基因(半显性)+天空蓝基因(性连锁)',
+                'combo2Name': '金属蓝草改良',
+                'combo2Formula1': '♀ 蓝草尾 × ♂ 金属蓝草尾',
+                'combo2Formula2': '♀ 跑红体蓝草 × ♂ 金属蓝草尾',
+                'combo2Desc': '增强草尾的金属光泽与蓝色饱和度。跑红体组合可引入黄化基因改善体型。F1代中筛选:<br>1. 鳞片金属反光强烈<br>2. 尾鳍纹路清晰整齐<br>3. 体型匀称无脊柱弯曲',
+                'combo2Key': '金属基因(限性)+蓝草基因(多基因)',
+                'combo3Name': '冰蓝天空融合',
+                'combo3Formula1': '♀ 冰蓝 × ♂ 天空蓝',
+                'combo3Formula2': '♀ 冰蓝 × ♂ 火烧云天空蓝',
+                'combo3Desc': '创造淡雅与鲜亮之间的过渡色系。可能获得"冰晶天空蓝"新表现型。F1代中筛选:<br>1. 体色均匀无斑块<br>2. 蓝色具有通透感<br>3. 背鳍与尾鳍颜色协调',
+                'combo3Key': '冰蓝基因(隐性)+天空蓝基因(性连锁)',
+                'combo4Name': '白金基因提纯',
+                'combo4Formula1': '♀ 白金象耳 × ♂ 白金象耳',
+                'combo4Formula2': '♀ 白金象耳 × ♂ 跑红体蓝草',
+                'combo4Desc': '提纯白金基因或引入黄化基因改善体型。F1代中筛选:<br>1. 白金覆盖面积≥80%<br>2. 耳状胸鳍明显<br>3. 体型健壮无畸形',
+                'combo4Key': '白金基因(限性)+跑红体基因(隐性)',
+                'combo5Name': '特殊尾型固定',
+                'combo5Formula1': '♀ 菊花帆褶扇 × ♂ 蓝礼服大C',
+                'combo5Formula2': '♀ 菊花帆褶扇 × ♂ 金属蓝草尾',
+                'combo5Desc': '将特殊尾型与优质体色结合。F1代中筛选:<br>1. 尾鳍褶皱分明呈菊花状<br>2. 展开角度≥120°<br>3. 游姿稳健不歪斜',
+                'combo5Key': '菊花尾基因(多基因)+礼服/金属基因',
+                'combo6Name': '自交提纯组合',
+                'combo6Formula1': '♀ 拉朱莉 × ♂ 拉朱莉',
+                'combo6Formula2': '♀ 彩虹天使 × ♂ 彩虹天使',
+                'combo6Formula3': '♀ 金粉 × ♂ 金粉',
+                'combo6Desc': '保持纯种基因稳定性，防止退化。连续自交不超过3代，需记录每代表现。',
+                'combo6Key': '纯合子维持，注意近交衰退',
+                'or': '或',
+                'hybridNote': '注：所有杂交建议使用6月龄以上健康种鱼，雌雄比例建议1:2或1:3，产前提供充足活饵。',
+                'recordTitle': '📝 繁育项目记录表',
+                'recordDesc': '记录每次杂交实验的详细信息，用于追踪F1代表现和选育进程：',
+                'addRecord': '+ 添加新记录',
+                'clearTable': '清空表格',
+                'recordId': '记录ID',
+                'hybridDate': '杂交日期',
+                'hybridCombo': '杂交组合',
+                'femaleId': '母本编号',
+                'maleId': '父本编号',
+                'spawnDate': '产卵日期',
+                'f1Count': 'F1数量',
+                'f1Notes': 'F1代表现与选留记录',
+                'femalePlaceholder': '如: F-蓝草-03',
+                'malePlaceholder': '如: M-金属草-07',
+                'countPlaceholder': '数量',
+                'notesPlaceholder': '记录F1代表现...',
+                'currentNotes': '本次记录备注',
+                'currentNotesPlaceholder': '记录本次杂交的特殊情况、观察发现或后续计划...',
+                'exportExcel': '📥 下载Excel育种记录表',
+                'print': '🖨️ 打印当前页面',
+                'saveLocal': '💾 保存数据到本地',
+                'expertTips': '💡 育种专家建议',
+                'tip1': '<strong>基因分离规律</strong>：F1代可能呈现亲本中间性状，F2代才会出现性状分离，建议保留F2代继续选育。',
+                'tip2': '<strong>选育标准</strong>：重点关注尾型、体色、体型、游姿四个指标，每个指标设定具体标准。',
+                'tip3': '<strong>记录重要性</strong>：详细记录每代亲本编号，避免近亲繁殖导致基因衰退。',
+                'tip4': '<strong>剑尾鱼处理</strong>：剑尾鱼与孔雀鱼存在生殖隔离，请分开饲养。',
+                'tip5': '<strong>健康管理</strong>：繁殖期提供高蛋白活饵，保持水质稳定（pH 7.0-7.5，温度24-26℃）。',
+                'footer': '孔雀鱼高级杂交育种管理系统 | 基于遗传学原理设计 | 数据仅存储于本地浏览器'
+            },
+            'en': {
+                'title': '🐠 Guppy Advanced Hybrid Breeding Management System 🐠',
+                'subtitle': 'Design scientific hybridization formulas for your guppy varieties and record breeding projects to obtain excellent F1 offspring.',
+                'watermark': 'Guppy Breeding',
+                'breedList': '📋 Your Guppy Varieties List',
+                'breedDesc': 'Based on the varieties you provided, the system has automatically categorized and designed hybridization formulas:',
+                'geneticNote': 'Note: Varieties with <span style="color: #ff6b6b;">red background</span> are swordtails, which have reproductive isolation from guppies and cannot be crossed. It is recommended to keep them separately.',
+                'hybridTitle': '🧬 Scientific Hybridization Formulas (Premium F1 Combinations)',
+                'hybridDesc': 'Combinations designed based on genetic principles, aiming to obtain F1 offspring with excellent appearance and stable genes:',
+                'comboName': 'Combination',
+                'formula': 'Hybrid Formula',
+                'f1Expectation': 'Expected F1 Performance & Selection Goals',
+                'geneticKey': 'Genetic Key Points',
+                'combo1Name': 'Sky Blue & Tuxedo Enhancement',
+                'combo1Formula1': '♀ Blue Tuxedo Big C × ♂ Flaming Sky Blue',
+                'combo1Formula2': '♀ Common Blue Tuxedo × ♂ Sky Blue',
+                'combo1Desc': 'Obtain individuals with full tail shape (Tuxedo gene) and bright body color (Sky Blue gene). Select in F1:<br>1. Broad caudal fin with distinct black edges<br>2. Pure blue body color without spots<br>3. Keep individuals with high dorsal fins',
+                'combo1Key': 'Tuxedo gene (semi-dominant) + Sky Blue gene (sex-linked)',
+                'combo2Name': 'Metal Blue Grass Improvement',
+                'combo2Formula1': '♀ Blue Grass Tail × ♂ Metal Blue Grass Tail',
+                'combo2Formula2': '♀ Red-Bodied Blue Grass × ♂ Metal Blue Grass Tail',
+                'combo2Desc': 'Enhance the metallic luster and blue saturation of grass tails. The red-bodied combination can introduce the yellow gene to improve body shape. Select in F1:<br>1. Strong metallic reflection on scales<br>2. Clear and neat tail fin patterns<br>3. Well-proportioned body without spinal curvature',
+                'combo2Key': 'Metal gene (sex-limited) + Blue Grass gene (polygene)',
+                'combo3Name': 'Ice Blue & Sky Blue Fusion',
+                'combo3Formula1': '♀ Ice Blue × ♂ Sky Blue',
+                'combo3Formula2': '♀ Ice Blue × ♂ Flaming Sky Blue',
+                'combo3Desc': 'Create transitional color tones between elegant and bright. May obtain new phenotypes like "Crystal Sky Blue". Select in F1:<br>1. Even body color without patches<br>2. Blue has a translucent feel<br>3. Coordinated color between dorsal and caudal fins',
+                'combo3Key': 'Ice Blue gene (recessive) + Sky Blue gene (sex-linked)',
+                'combo4Name': 'Platinum Gene Purification',
+                'combo4Formula1': '♀ Platinum Dumbo Ear × ♂ Platinum Dumbo Ear',
+                'combo4Formula2': '♀ Platinum Dumbo Ear × ♂ Red-Bodied Blue Grass',
+                'combo4Desc': 'Purify the Platinum gene or introduce the yellow gene to improve body shape. Select in F1:<br>1. Platinum coverage area ≥ 80%<br>2. Distinct dumbo ear-like pectoral fins<br>3. Healthy body without deformities',
+                'combo4Key': 'Platinum gene (sex-limited) + Red-Body gene (recessive)',
+                'combo5Name': 'Special Tail Type Fixation',
+                'combo5Formula1': '♀ Chrysanthemum Veiltail × ♂ Blue Tuxedo Big C',
+                'combo5Formula2': '♀ Chrysanthemum Veiltail × ♂ Metal Blue Grass Tail',
+                'combo5Desc': 'Combine special tail types with high-quality body colors. Select in F1:<br>1. Caudal fin clearly folded like a chrysanthemum<br>2. Spread angle ≥ 120°<br>3. Stable swimming posture without tilting',
+                'combo5Key': 'Chrysanthemum Tail gene (polygene) + Tuxedo/Metal gene',
+                'combo6Name': 'Inbreeding Purification',
+                'combo6Formula1': '♀ Lajuli × ♂ Lajuli',
+                'combo6Formula2': '♀ Rainbow Angel × ♂ Rainbow Angel',
+                'combo6Formula3': '♀ Gold Powder × ♂ Gold Powder',
+                'combo6Desc': 'Maintain purebred gene stability and prevent degeneration. Continuous inbreeding should not exceed 3 generations; record performance each generation.',
+                'combo6Key': 'Homozygote maintenance, beware of inbreeding depression',
+                'or': 'or',
+                'hybridNote': 'Note: All crosses are recommended using healthy broodstock over 6 months old, with a female-to-male ratio of 1:2 or 1:3. Provide ample live food before spawning.',
+                'recordTitle': '📝 Breeding Project Record Table',
+                'recordDesc': 'Record detailed information of each hybridization experiment to track F1 performance and selection progress:',
+                'addRecord': '+ Add New Record',
+                'clearTable': 'Clear Table',
+                'recordId': 'Record ID',
+                'hybridDate': 'Hybrid Date',
+                'hybridCombo': 'Hybrid Combination',
+                'femaleId': 'Female ID',
+                'maleId': 'Male ID',
+                'spawnDate': 'Spawn Date',
+                'f1Count': 'F1 Count',
+                'f1Notes': 'F1 Performance & Selection Notes',
+                'femalePlaceholder': 'e.g., F-BlueGrass-03',
+                'malePlaceholder': 'e.g., M-MetalGrass-07',
+                'countPlaceholder': 'Count',
+                'notesPlaceholder': 'Record F1 performance...',
+                'currentNotes': 'Current Record Notes',
+                'currentNotesPlaceholder': 'Record special circumstances, observations, or follow-up plans for this cross...',
+                'exportExcel': '📥 Download Excel Breeding Record',
+                'print': '🖨️ Print Current Page',
+                'saveLocal': '💾 Save Data Locally',
+                'expertTips': '💡 Expert Breeding Tips',
+                'tip1': '<strong>Law of Segregation</strong>: F1 may show intermediate parental traits; traits segregate in F2. It is recommended to retain F2 for continued selection.',
+                'tip2': '<strong>Selection Criteria</strong>: Focus on four indicators: tail type, body color, body shape, and swimming posture. Set specific standards for each.',
+                'tip3': '<strong>Importance of Records</strong>: Record parent IDs for each generation in detail to avoid inbreeding leading to genetic decline.',
+                'tip4': '<strong>Swordtail Handling</strong>: Swordtails and guppies have reproductive isolation. Please keep them separately.',
+                'tip5': '<strong>Health Management</strong>: Provide high-protein live food during breeding periods. Maintain stable water quality (pH 7.0-7.5, temperature 24-26°C).',
+                'footer': 'Guppy Advanced Hybrid Breeding Management System | Based on Genetic Principles | Data Stored Locally in Browser Only'
+            }
+        };
+
+        // 语言切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('toggleLang');
+            let currentLang = localStorage.getItem('guppyLang') || 'zh';
+
+            function applyLanguage(lang) {
+                const t = translations[lang];
+                // 翻译所有带 data-i18n 的元素
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (t[key]) {
+                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+                            // 不改变输入框的值，只改placeholder
+                        } else {
+                            el.innerHTML = t[key];
+                        }
+                    }
+                });
+                // 翻译所有 placeholder (data-i18n-ph)
+                document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-ph');
+                    if (t[key]) {
+                        el.setAttribute('placeholder', t[key]);
+                    }
+                });
+                // 更新按钮文本
+                toggleBtn.textContent = lang === 'zh' ? 'EN' : '中文';
+                // 保存语言偏好
+                localStorage.setItem('guppyLang', lang);
+            }
+
+            toggleBtn.addEventListener('click', function() {
+                currentLang = currentLang === 'zh' ? 'en' : 'zh';
+                applyLanguage(currentLang);
+            });
+
+            // 初始化应用语言
+            applyLanguage(currentLang);
+
+            // ---------- 以下是原有的育种记录功能逻辑 ----------
+            const breedingTableBody = document.getElementById('breedingTableBody');
+            const addRecordBtn = document.getElementById('addRecordBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const exportExcelBtn = document.getElementById('exportExcelBtn');
+            let recordCounter = 2; // 从2开始，因为已有一条示例记录
+
+            function showAlert(message) { alert(message); }
+
+            addRecordBtn.addEventListener('click', function() {
+                const today = new Date().toISOString().split('T')[0];
+                const futureDate = new Date(); futureDate.setDate(futureDate.getDate() + 15);
+                const futureDateStr = futureDate.toISOString().split('T')[0];
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `<td>BR-${recordCounter.toString().padStart(3, '0')}</td><td><input type="date" value="${today}"></td><td><select><option data-i18n="combo1Name">礼服天空蓝强化</option><option data-i18n="combo2Name">金属蓝草改良</option><option data-i18n="combo3Name">冰蓝天空融合</option><option data-i18n="combo4Name" selected>白金基因提纯</option><option data-i18n="combo5Name">特殊尾型固定</option><option data-i18n="combo6Name">自交提纯组合</option></select></td><td><input type="text" data-i18n-ph="femalePlaceholder" placeholder="如: F-白金-01"></td><td><input type="text" data-i18n-ph="malePlaceholder" placeholder="如: M-白金-02"></td><td><input type="date" value="${futureDateStr}"></td><td><input type="number" value="0" min="0" data-i18n-ph="countPlaceholder" placeholder="数量"></td><td><textarea rows="2" data-i18n-ph="notesPlaceholder" placeholder="记录F1代表现..."></textarea></td>`;
+                breedingTableBody.appendChild(newRow);
+                recordCounter++;
+                // 为新添加的行也应用当前语言
+                applyLanguage(currentLang);
+                showAlert(`已添加新记录 BR-${(recordCounter-1).toString().padStart(3, '0')}`);
+            });
+
+            clearBtn.addEventListener('click', function() {
+                if(confirm('确定要清空所有记录吗？此操作不可撤销。')) {
+                    breedingTableBody.innerHTML = '';
+                    recordCounter = 1;
+                    showAlert('所有记录已清空');
+                }
+            });
+
+            exportExcelBtn.addEventListener('click', function() {
+                const hybridData = [];
+                const breedingData = [];
+                document.querySelectorAll('#hybridTable tbody tr').forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if(cells.length >= 4) {
+                        hybridData.push({
+                            '组合名称': cells[0].innerText,
+                            '杂交公式': cells[1].innerText.replace(/\s+/g, ' '),
+                            'F1代预期表现': cells[2].innerText.replace(/\s+/g, ' '),
+                            '遗传关键点': cells[3].innerText
+                        });
+                    }
+                });
+                document.querySelectorAll('#breedingTableBody tr').forEach(row => {
+                    const recordId = row.cells[0].innerText;
+                    const dateInput = row.cells[1].querySelector('input');
+                    const hybridType = row.cells[2].querySelector('select');
+                    const femaleId = row.cells[3].querySelector('input');
+                    const maleId = row.cells[4].querySelector('input');
+                    const spawnDate = row.cells[5].querySelector('input');
+                    const fryCount = row.cells[6].querySelector('input');
+                    const notes = row.cells[7].querySelector('textarea');
+                    breedingData.push({
+                        '记录ID': recordId,
+                        '杂交日期': dateInput?.value || '',
+                        '杂交组合': hybridType?.value || '',
+                        '母本编号': femaleId?.value || '',
+                        '父本编号': maleId?.value || '',
+                        '产卵日期': spawnDate?.value || '',
+                        'F1数量': fryCount?.value || '0',
+                        'F1代表现': notes?.value || ''
+                    });
+                });
+                const wb = XLSX.utils.book_new();
+                const hybridWs = XLSX.utils.json_to_sheet(hybridData);
+                XLSX.utils.book_append_sheet(wb, hybridWs, "杂交公式");
+                const breedingWs = XLSX.utils.json_to_sheet(breedingData);
+                XLSX.utils.book_append_sheet(wb, breedingWs, "育种记录");
+                const notesData = [
+                    {'项目': '系统说明', '内容': '孔雀鱼高级杂交育种管理系统'},
+                    {'项目': '导出时间', '内容': new Date().toLocaleString('zh-CN')}
+                ];
+                const notesWs = XLSX.utils.json_to_sheet(notesData);
+                XLSX.utils.book_append_sheet(wb, notesWs, "说明");
+                XLSX.writeFile(wb, `孔雀鱼育种记录_${new Date().toISOString().split('T')[0]}.xlsx`);
+                showAlert('Excel文件已开始下载');
+            });
+
+            document.getElementById('printBtn').addEventListener('click', function() { window.print(); });
+
+            document.getElementById('saveDataBtn').addEventListener('click', function() {
+                const data = {
+                    breedingRecords: [],
+                    notes: document.getElementById('notes').value,
+                    lastSaved: new Date().toISOString()
+                };
+                document.querySelectorAll('#breedingTableBody tr').forEach(row => {
+                    const recordId = row.cells[0].innerText;
+                    const dateInput = row.cells[1].querySelector('input');
+                    const hybridType = row.cells[2].querySelector('select');
+                    const femaleId = row.cells[3].querySelector('input');
+                    const maleId = row.cells[4].querySelector('input');
+                    const spawnDate = row.cells[5].querySelector('input');
+                    const fryCount = row.cells[6].querySelector('input');
+                    const notes = row.cells[7].querySelector('textarea');
+                    data.breedingRecords.push({
+                        recordId,
+                        hybridDate: dateInput?.value || '',
+                        hybridType: hybridType?.value || '',
+                        femaleId: femaleId?.value || '',
+                        maleId: maleId?.value || '',
+                        spawnDate: spawnDate?.value || '',
+                        fryCount: fryCount?.value || '0',
+                        notes: notes?.value || ''
+                    });
+                });
+                localStorage.setItem('guppyBreedingData', JSON.stringify(data));
+                showAlert('数据已保存到本地浏览器');
+            });
+
+            // 加载之前保存的数据
+            const savedData = localStorage.getItem('guppyBreedingData');
+            if(savedData && confirm('检测到本地保存的育种数据，是否加载？')) {
+                try {
+                    const data = JSON.parse(savedData);
+                    // 保留第一条示例记录
+                    while(breedingTableBody.children.length > 1) {
+                        breedingTableBody.removeChild(breedingTableBody.lastChild);
+                    }
+                    recordCounter = 2;
+                    data.breedingRecords.forEach(record => {
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `<td>${record.recordId}</td><td><input type="date" value="${record.hybridDate}"></td><td><select><option ${record.hybridType==='礼服天空蓝强化'?'selected':''} data-i18n="combo1Name">礼服天空蓝强化</option><option ${record.hybridType==='金属蓝草改良'?'selected':''} data-i18n="combo2Name">金属蓝草改良</option><option ${record.hybridType==='冰蓝天空融合'?'selected':''} data-i18n="combo3Name">冰蓝天空融合</option><option ${record.hybridType==='白金基因提纯'?'selected':''} data-i18n="combo4Name">白金基因提纯</option><option ${record.hybridType==='特殊尾型固定'?'selected':''} data-i18n="combo5Name">特殊尾型固定</option><option ${record.hybridType==='自交提纯组合'?'selected':''} data-i18n="combo6Name">自交提纯组合</option></select></td><td><input type="text" value="${record.femaleId}" data-i18n-ph="femalePlaceholder" placeholder="如: F-白金-01"></td><td><input type="text" value="${record.maleId}" data-i18n-ph="malePlaceholder" placeholder="如: M-白金-02"></td><td><input type="date" value="${record.spawnDate}"></td><td><input type="number" value="${record.fryCount}" min="0" data-i18n-ph="countPlaceholder" placeholder="数量"></td><td><textarea rows="2" data-i18n-ph="notesPlaceholder" placeholder="记录F1代表现...">${record.notes}</textarea></td>`;
+                        breedingTableBody.appendChild(newRow);
+                        const idNum = parseInt(record.recordId.replace('BR-', ''));
+                        if(idNum >= recordCounter) recordCounter = idNum + 1;
+                    });
+                    if(data.notes) document.getElementById('notes').value = data.notes;
+                    // 为加载的数据行也应用语言
+                    applyLanguage(currentLang);
+                    showAlert(`已加载 ${data.breedingRecords.length} 条记录`);
+                } catch(e) {
+                    console.error('加载数据出错:', e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
